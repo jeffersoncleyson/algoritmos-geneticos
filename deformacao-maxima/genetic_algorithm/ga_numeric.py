@@ -60,6 +60,7 @@ class genetic_algorithm(object):
         #    print('Mutation!')
         return test
     
+    
     def __bestFitness(self):
      
         pop_fit = self.problem.fitness(self.population)
