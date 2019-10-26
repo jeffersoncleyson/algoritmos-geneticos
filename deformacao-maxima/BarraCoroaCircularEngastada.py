@@ -3,10 +3,17 @@ from math import pi as PI
 
 class BarraCoroaCircularEngastada(object):
 
-    def __init__(self, individual_size):
+    def __init__(self,MinD, MaxD, Mind, Maxd, individual_size):
+        self.MinD = MinD
+        self.MaxD = MaxD
+        self.Mind = Mind
+        self.Maxd = MaxD
         self.individual_size = individual_size
         self.max_symbol = 1
         self.min_symbol = 0
+
+        self.F = 2000
+        self.L = 300
 
     '''
     @param self: 
@@ -19,8 +26,16 @@ class BarraCoroaCircularEngastada(object):
 
     @return : Formula de deformação da estrutura
     '''
-    def funcao_Deformacao(self, F, L, D, d):
-        return (32 * F * L * D) / (206500 * PI * (D**4 - d**4))
+    def funcao_Deformacao(self, D, d):
+        return (32 * self.F * self.L * D) / (2.065e5 * PI * (D**4 - d**4))
+
+    def DReal(self, D):
+        Precision = (self.MaxD - self.MinD)/((2.0**(self.individual_size/2)) - 1)
+        return self.MinD+(Precision)*D
+    
+    def dReal(self, d):
+        Precision = (self.Maxd - self.Mind)/((2.0**(self.individual_size/2)) - 1)
+        return self.Mind+(Precision)*d
 
     '''
     @param num_individual: numero de individuos da população
@@ -56,20 +71,23 @@ class BarraCoroaCircularEngastada(object):
 
     def getFitness(self,individual):
 
-        size_div = self.individual_size/4
+        # size_div = self.individual_size/4
 
-        dec_ind_F = self.bin_to_dec(individual[:int(size_div)])
-        dec_ind_L = self.bin_to_dec(individual[int(size_div):int(2*size_div)])
-        dec_ind_D = self.bin_to_dec(individual[int(2*size_div):int(3*size_div)])
-        dec_ind_d = self.bin_to_dec(individual[int(3*size_div):])
+        # dec_ind_F = self.bin_to_dec(individual[:int(size_div)])
+        # dec_ind_L = self.bin_to_dec(individual[int(size_div):int(2*size_div)])
+        # dec_ind_D = self.bin_to_dec(individual[int(2*size_div):int(3*size_div)])
+        # dec_ind_d = self.bin_to_dec(individual[int(3*size_div):])
 
-        fitness = -1
+        size_div = self.individual_size/2
 
-        #print('F=%g L=%g D=%g d=%g' %(dec_ind_F, dec_ind_L, dec_ind_D, dec_ind_d))
-        try:
-            fitness = self.funcao_Deformacao(dec_ind_F,dec_ind_L,dec_ind_D,dec_ind_d)
-        except Exception as e:
-            pass
+        auxD = self.bin_to_dec(individual[:int(size_div)])
+        auxd = self.bin_to_dec(individual[int(size_div):])
+
+        dec_ind_D = self.DReal(auxD)
+        dec_ind_d = self.dReal(auxd)
+
+        
+        fitness = self.funcao_Deformacao(dec_ind_D,dec_ind_d)
         
 
         return fitness
@@ -81,18 +99,21 @@ class BarraCoroaCircularEngastada(object):
 
         print(solution)
 
-        size_div = self.individual_size/4
+        size_div = self.individual_size/2
 
-        dec_ind_F = self.bin_to_dec(solution[:int(size_div)])
-        dec_ind_L = self.bin_to_dec(solution[int(size_div):int(2*size_div)])
-        dec_ind_D = self.bin_to_dec(solution[int(2*size_div):int(3*size_div)])
-        dec_ind_d = self.bin_to_dec(solution[int(3*size_div):])
+        auxD = self.bin_to_dec(solution[:int(size_div)])
+        auxd = self.bin_to_dec(solution[int(size_div):])
 
-        print('F=%g'%dec_ind_F)
-        print('L=%g'%dec_ind_L)
+        dec_ind_D = self.DReal(auxD)
+        dec_ind_d = self.dReal(auxd)
+
+
+
+        print('F=%g'%self.F)
+        print('L=%g'%self.L)
         print('D=%g'%dec_ind_D)
         print('d=%g'%dec_ind_d)
-        print('f(F,L,D,d)=%g'%self.funcao_Deformacao(dec_ind_F,dec_ind_L,dec_ind_D,dec_ind_d)) 
+        print('f(F,L,D,d)=%g'%self.funcao_Deformacao(dec_ind_D,dec_ind_d)) 
 
     
     '''Getters and Setters'''

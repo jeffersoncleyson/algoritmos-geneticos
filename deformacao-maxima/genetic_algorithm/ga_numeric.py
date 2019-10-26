@@ -9,10 +9,12 @@ class genetic_algorithm(object):
     classdocs
     '''
 
-    def __init__(self, problem, mutation_rate, elitism = None):
+    def __init__(self, problem, mutation_rate, elitism = None, taxaCrossover = 0.65):
         '''
         Constructor
         '''
+        #TAXA DE CROSSOVER 65%        
+        self.taxaCrossover = taxaCrossover
         self.__mutationRate = mutation_rate
         if(elitism == None):
             self.__elitism = False
@@ -29,8 +31,8 @@ class genetic_algorithm(object):
             #print('Mutation at position: %d' %randomPosition)
             #get a random value for changing in the individual position selected before
             randomValue = np.random.uniform(self.problem.getMinGeneSymbol(),self.problem.getMaxGeneSymbol())
-         
-            if(randomValue <= 0.5):
+
+            if randomValue <= 0.5:
                 randomValue = int(randomValue)
             else:
                 randomValue = int(randomValue+1)
@@ -54,7 +56,7 @@ class genetic_algorithm(object):
             if randomNumber < total:
                 break
         test=a[i]
-        #if test == 1:
+        # if test == 1:
         #    print('Mutation!')
         return test
     
@@ -76,10 +78,10 @@ class genetic_algorithm(object):
         
         n=self.problem.getIndividualSize()
         
-        c = np.random.uniform(1,n)
-        d = np.random.uniform(1,n)    
-        #print("crossing point 1: %d" %c)
-        #print("crossing point 2: %d" %d)
+        c = int(np.random.uniform(1,n))
+        d = int(np.random.uniform(1,n))    
+        # print("crossing point 1: %d" %c)
+        # print("crossing point 2: %d" %d)
         
         new_individual_x=[]
         new_individual_y=[]
@@ -101,11 +103,11 @@ class genetic_algorithm(object):
     
     def __crossover(self,individual_x,individual_y):
         
-        
         n=self.problem.getIndividualSize()
         
-        c = int(np.random.uniform(0,n-1))
-        #print("crossing point: %d" %c)
+        # c = int(np.random.uniform(0,n-1))
+        c = round(n*self.taxaCrossover)
+
         
         new_individual_x=[]
         new_individual_y=[]
@@ -166,7 +168,7 @@ class genetic_algorithm(object):
             y = self.__selection()
             
             #Crossover
-            new_individual_x,new_individual_y = self.__crossover(x,y)
+            new_individual_x,new_individual_y = self.__crossover3(x,y)
             
             #Mutation
             new_individual_x = self.__mutation(new_individual_x)
@@ -183,7 +185,7 @@ class genetic_algorithm(object):
         
         generation = 1
         fit_historical=[]
-        #last_best_fit = 0 
+        last_best_fit = self.best_fit 
         
         self.population = self.problem.initPopulation(population_size)
         
@@ -195,8 +197,8 @@ class genetic_algorithm(object):
         
         fit_historical.append(self.best_fit)
                 
-        #while (np.abs(self.best_fit-last_best_fit) > target) and (generation < max_generation):
-        while (generation < max_generation):                     
+        while (np.abs(self.best_fit-last_best_fit) > target) and (generation < max_generation):
+        # while (generation < max_generation):                     
                 
             generation=generation+1
             
